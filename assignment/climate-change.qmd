@@ -1,6 +1,6 @@
 ---
 title: "Climate Change Module"
-author: 'Add name'
+author: 'Sara Walker'
 format:
   html:
     embed-resources: true
@@ -12,12 +12,12 @@ library(tidyverse)
 
 ## Warm-up: Examining CO2 trends in R
 
-- Example from <http://climate.nasa.gov/vital-signs/carbon-dioxide/>
-- Raw data from <https://gml.noaa.gov/webdata/ccgg/trends/co2/co2_mm_mlo.txt>
+-   Example from <http://climate.nasa.gov/vital-signs/carbon-dioxide/>
+-   Raw data from <https://gml.noaa.gov/webdata/ccgg/trends/co2/co2_mm_mlo.txt>
 
 In 1958, Dr. Charles David Keeling (1928-2005), a scientist at Scripps Institute of Oceanography, began collecting data on atmospheric CO2 concentration at the Mauna Loa Observatory located in Hawaii. This dataset allowed us to understand the degree to which climate change is human-caused through our burning of fossil fuels and release of CO2 into the atmosphere. Due to his scientific achievements, Dr. Keeling was awarded the National Medal of Science by President George W. Bush in 2002. This is the highest award for lifetime scientific achievement that can be granted in the U.S. Today, you get to analyze this same dataset, except that you have more data than was available to Dr. Keeling and his colleagues because your dataset extends up to the current time.
 
-To read the code, you will use a new function called `read_table`.  It is similar to `read_csv` except it looks for spaces between column entries rather than commas (remember that csv stands for comma-separated values).  Others include `read_tsv`, which uses tabs to separate entries.  You can discover the separation type by putting <https://gml.noaa.gov/webdata/ccgg/trends/co2/co2_mm_mlo.txt> into your web browser and examining the file.  The code also includes an argument for comment, which denotes the character used to define a line in the file as being a comment rather than data or a header.  The file also reveals that the column headers are on lines with a comment character, so they won't be read.  You will use the argument `col_names` to define the headers manually.  Finally, `NA` values are defined by the numbers -1 and -99, so they need to be defined using the `na` argument (otherwise, they will be read as numeric values).
+To read the code, you will use a new function called `read_table`. It is similar to `read_csv` except it looks for spaces between column entries rather than commas (remember that csv stands for comma-separated values). Others include `read_tsv`, which uses tabs to separate entries. You can discover the separation type by putting <https://gml.noaa.gov/webdata/ccgg/trends/co2/co2_mm_mlo.txt> into your web browser and examining the file. The code also includes an argument for comment, which denotes the character used to define a line in the file as being a comment rather than data or a header. The file also reveals that the column headers are on lines with a comment character, so they won't be read. You will use the argument `col_names` to define the headers manually. Finally, `NA` values are defined by the numbers -1 and -99, so they need to be defined using the `na` argument (otherwise, they will be read as numeric values).
 
 ```{r message=FALSE}
 
@@ -31,7 +31,6 @@ co2 <-  read_table("https://gml.noaa.gov/webdata/ccgg/trends/co2/co2_mm_mlo.txt"
 co2
 ```
 
-
 ```{r}
 ggplot(co2, aes(x = decimal_date, y = monthly_average)) + 
   geom_line() + 
@@ -41,21 +40,34 @@ ggplot(co2, aes(x = decimal_date, y = monthly_average)) +
 
 **Question 1:**
 
-Describe the overall trend in the CO2 data.
+######################################################################################################### 
+
+There is a consistent upward trend in the data.This data shows a direct positive relationship between co2 concentration and passage of time. 
 
 **Answer 1:**
 
 **Question 2:**
 
-How does CO2 vary within a year?  What month is it at max?  Min?  What might explain this sub-annual pattern? (you will need to write code and make a plot to answer this question)
+How does CO2 vary within a year? What month is it at max? Min? What might explain this sub-annual pattern? (you will need to write code and make a plot to answer this question)
 
+In order to answer this question I grouped by month and I averaged the co2 for each of the 12 months data over the years to get one average co2 value for each month. I then plotted that to show the trends and fluctuation that is shown throughout a year.The co2 reaches max levels in the month of may and minimum levels in September. This pattern can be explained by times that we reach peak respiration and photosynthesis. 
 **Answer 2:**
+```{r}
+co2_average <- co2 |> 
+  group_by(month) |> 
+  summarize(average_month = mean(monthly_average, na.rm = TRUE, .groups = "drop"))
 
-
+ggplot(co2_average, aes(month, average_month)) +
+  geom_line() +
+  geom_point() +
+  theme_bw() +
+  labs(x = "Month",
+       y = "Average Co2 concentration")
+```
 
 ## Global Temperature Data
 
-Current climate change affects many aspects of the environment, with socio-economic consequences. For example, a warmer climate can allow new diseases to be introduced and persist (e.g., West Nile became established in the United States after an unusually warm winter, which allowed the mosquitoes that carry the virus to survive and spread). We are concerned not only with the actual temperature but also with the rate at which it changes. Rapid changes make it more likely that species cannot adapt and will go extinct. 
+Current climate change affects many aspects of the environment, with socio-economic consequences. For example, a warmer climate can allow new diseases to be introduced and persist (e.g., West Nile became established in the United States after an unusually warm winter, which allowed the mosquitoes that carry the virus to survive and spread). We are concerned not only with the actual temperature but also with the rate at which it changes. Rapid changes make it more likely that species cannot adapt and will go extinct.
 
 Each of the most recent years has been the warmest on record. In this section, we will analyze global mean temperature data.
 
@@ -63,14 +75,14 @@ Data from: <https://climate.nasa.gov/vital-signs/global-temperature/>
 
 **Question 3:**
 
-Describe the data set to the best of your ability, given the documentation provided. 
+Describe the data set to the best of your ability, given the documentation provided.
 
-- Where is the data from?
-- Describe the class of each column and what units it is measured in. 
-- What is the difference between "global temperature" and "global temperature anomaly"? 
+-   Where is the data from?
+-   Describe the class of each column and what units it is measured in.
+-   What is the difference between "global temperature" and "global temperature anomaly"?
 
 **Answer 3:**
-
+The data set is showing changes in global surface temperature compared to the long-term average with the data source being NASA and GISS. There is a years column which is measured in years/time and has a numeric class. There is a No_Smoothing column measured in celsius degrees and has a numeric class. There is also a Lowess column which is also measured in celsius degrees and has a numeric class. Global temperature is the actual of the earth while global temperature anomaly is the difference between actual temperature and the average.
 
 **Question 4:**
 
@@ -78,57 +90,107 @@ Construct the necessary R code to import and prepare for plotting the following 
 
 You'll need to determine the file's delimiter and any comments or skips. You will also need to be sure that you have column names. You will not directly use the code above to read the CO2 data, but that code provides helpful tips for reading the data.
 
-**Answer 4:**
+**Answer 4:** 
+```{r}
+
+global_temperature <- read_table("https://data.giss.nasa.gov/gistemp/graphs/graph_data/Global_Mean_Estimates_based_on_Land_and_Ocean_Data/graph.txt", col_names = c("Year", "No_Smoothing", "Lowess")) 
+
+global_temperature <- global_temperature[-c(1:4),]
+
+global_temperature <- transform(global_temperature, Year = as.numeric(Year), No_Smoothing = as.numeric(No_Smoothing), Lowess = as.numeric(No_Smoothing))
+
+global_temperature
+```
 
 **Question 5:**
 
-Plot the trend in global mean temperatures over time.  Describe what you see in the plot and how you interpret the patterns you observe.
+Plot the trend in global mean temperatures over time. Describe what you see in the plot and how you interpret the patterns you observe.
+
+In the plot I see a general upward trend in global mean temperatures over time. It stays fairly consistent with even slight decrease until around 1920, in which there is a shift in which the rest of the graph generally shows an upward trend with variation between years.
 
 **Answer 5:**
+```{r}
+global_temperature |> 
+  ggplot(aes(Year, No_Smoothing)) +
+  geom_point() +
+  geom_line() +
+  theme_bw() +
+  labs(title = "Global Mean Temperatures over Time", x = "Year", y = "Global Mean Temperature")
+  
+  
+```
 
 ## Evaluating the evidence for a "Pause" in warming?
 
-The [2013 IPCC Report](https://www.ipcc.ch/pdf/assessment-report/ar5/wg1/WG1AR5_SummaryVolume_FINAL.pdf) included a tentative observation of a "much smaller increasing trend" in global mean temperatures since 1998 than was observed previously.  This led to much discussion in the media about the existence of a "Pause" or "Hiatus" in global warming rates, as well as much research looking into where the extra heat could have gone.  (Examples discussing this question include articles in [The Guardian](http://www.theguardian.com/environment/2015/jun/04/global-warming-hasnt-paused-study-finds), [BBC News](http://www.bbc.com/news/science-environment-28870988), and [Wikipedia](https://en.wikipedia.org/wiki/Global_warming_hiatus)). 
+The [2013 IPCC Report](https://www.ipcc.ch/pdf/assessment-report/ar5/wg1/WG1AR5_SummaryVolume_FINAL.pdf) included a tentative observation of a "much smaller increasing trend" in global mean temperatures since 1998 than was observed previously. This led to much discussion in the media about the existence of a "Pause" or "Hiatus" in global warming rates, as well as much research looking into where the extra heat could have gone. (Examples discussing this question include articles in [The Guardian](http://www.theguardian.com/environment/2015/jun/04/global-warming-hasnt-paused-study-finds), [BBC News](http://www.bbc.com/news/science-environment-28870988), and [Wikipedia](https://en.wikipedia.org/wiki/Global_warming_hiatus)).
 
 You will use rolling averages to help you explore the evidence for a pause. Since you have not been provided instructions for calculating rolling means, the learning objective of this question is to practice finding the solution.
 
 **Question 6:**
 
-Use a search engine (e.g., Google) or a chat LLM to find out how to calculate a rolling average in R. What search term or chat LLM prompt did you use?  What website or answer from the chat LLM did you end up using?  How much did you need to modify the code from the website or chat LLM to answer the question successfully?
+Use a search engine (e.g., Google) or a chat LLM to find out how to calculate a rolling average in R. What search term or chat LLM prompt did you use? What website or answer from the chat LLM did you end up using? How much did you need to modify the code from the website or chat LLM to answer the question successfully?
 
 **Answer 6:**
+I went onto yahoo and used the search term "How to calculate a rolling average in R". I decided to use the top search result. This took me to statology.org . I chose to do a k of 5 as the next question first mentions a period of five years. I did not have to change the code much in order to answer the question successfully, I just had to add in installation of the packages and substitute in my own data.
+```{r}
+install.packages("dplyr")
+install.packages("zoo")
+library(dplyr)
+library(zoo)
+
+global_temperature |> mutate(rolling_average = rollmean(No_Smoothing, k=5, fill=NA, align='right'))
+```
+
 
 **Question 7:**
 
-- What is the meaning of "5-year average" vs. "annual average"?
-- Create a data frame from the annual temperature anomaly data (from Question 4) with three new columns: 5-year running averages, 10-year running averages, and 20-year running averages.
+-   What is the meaning of "5-year average" vs. "annual average"?
+-   Create a data frame from the annual temperature anomaly data (from Question 4) with three new columns: 5-year running averages, 10-year running averages, and 20-year running averages.
+
+The point of having a five year average compared to an annual average is because it works to smooth short term variations and better show longer term trends within the data.
 
 **Answer 7:**
-
+```{r}
+global_temperature2 <- global_temperature |> 
+  mutate(five_year = rollmean(No_Smoothing, k=5, fill=NA, align='right')) |> 
+  mutate(ten_year = rollmean(No_Smoothing, k = 10, fill = NA, align = 'right')) |> 
+  mutate(twenty_year = rollmean(No_Smoothing, k = 20, fill = NA, align = 'right'))
+```
 **Question 8:**
 
-Plot the different averages on the *same plot* and describe what differences you see and why.  
+Plot the different averages on the *same plot* and describe what differences you see and why.
 
 **Answer 8:**
+```{r}
+global_temperature2 |> 
+  ggplot(aes(x = Year)) +
+  geom_line(aes(y = No_Smoothing, color = "Annual Average")) +
+  geom_line(aes(y = five_year, color = "Five Year Average")) +
+  geom_line(aes(y = ten_year, color = "Ten Year Average")) +
+  geom_line(aes(y = twenty_year, color = "Twenty Year Average")) +
+  theme_bw() +
+  labs(x = "Year", y = "Change in Global Mean Temperature (c)")
+
+```
 
 **Question 9:**
 
-By examining the data here, what evidence do you find or not find for such a pause? 
+By examining the data here, what evidence do you find or not find for such a pause?
 
 **Answer 9:**
 
 ## Longer term trends in CO2 Records
 
-When analyzing Earth’s climate, it is important to remember that Earth is 4.54 billion years old. Our analyses so far have only looked at recent history. How can we compare the recent data to prehistoric times? Are the current rates of change similar or different from those the earth has experienced in the past? To explore this, we can use data from ice cores drilled at the poles. 
+When analyzing Earth’s climate, it is important to remember that Earth is 4.54 billion years old. Our analyses so far have only looked at recent history. How can we compare the recent data to prehistoric times? Are the current rates of change similar or different from those the earth has experienced in the past? To explore this, we can use data from ice cores drilled at the poles.
 
-Hundreds of ice cores have been extracted from polar ice because they contain valuable data on atmospheric chemistry over pre-historic times. These valuable data exist in tiny air bubbles trapped in the ice. These air bubbles contain the same gases in the same ratios as the atmosphere at the time when the ice formed. The data you will analyze today are from ice cores extracted from the Vostok research station in Antarctica. As you have probably assumed, the depth of the ice core is related to how old the ice is; deep ice is older. There are two other variables that you will be analyzing from the ice cores.  You will analyze CO2 concentration, which has been measured from air bubbles trapped in the ice. We can use these data to see what rates of change were like during this pre-historic period, during which human activity was minimal. 
+Hundreds of ice cores have been extracted from polar ice because they contain valuable data on atmospheric chemistry over pre-historic times. These valuable data exist in tiny air bubbles trapped in the ice. These air bubbles contain the same gases in the same ratios as the atmosphere at the time when the ice formed. The data you will analyze today are from ice cores extracted from the Vostok research station in Antarctica. As you have probably assumed, the depth of the ice core is related to how old the ice is; deep ice is older. There are two other variables that you will be analyzing from the ice cores. You will analyze CO2 concentration, which has been measured from air bubbles trapped in the ice. We can use these data to see what rates of change were like during this pre-historic period, during which human activity was minimal.
 
 [Ice core data](https://data.ess-dive.lbl.gov/view/doi%3A10.3334%2FCDIAC%2FATG.009):
 
-Vostok Core, back to 400,000 years before the present day 
+Vostok Core, back to 400,000 years before the present day
 
-- Description of data set: <https://data.ess-dive.lbl.gov/view/doi%3A10.3334%2FCDIAC%2FATG.009>
-- data: <https://data.ess-dive.lbl.gov/catalog/d1/mn/v2/object/ess-dive-457358fdc81d3a5-20180726T203952542>
+-   Description of data set: <https://data.ess-dive.lbl.gov/view/doi%3A10.3334%2FCDIAC%2FATG.009>
+-   data: <https://data.ess-dive.lbl.gov/catalog/d1/mn/v2/object/ess-dive-457358fdc81d3a5-20180726T203952542>
 
 You will use this code to download the data to your computer.
 
@@ -139,21 +201,20 @@ download.file("https://data.ess-dive.lbl.gov/catalog/d1/mn/v2/object/ess-dive-45
 
 You can click on the file in your Files pane to view it before reading into R.
 
-
 **Question 10:**
 
 The broad question is: how do recent atmospheric CO2 levels compare to historical levels?
 
 Your answer to Question 10 is going to be a mix of code chunks and text that you put below in "Answer 10:"
 
-- Describe the data set: what are the columns and units? Where do the numbers come from? 
-- What is the temporal resolution of the data? 
-- Read in and prepare data for analysis.   
-- Reverse the ordering to create a chronological record so that each measurement is associcated with calender year.
-- Plot data.  
-- Combine this time series with the Mauna Loa data (the Warm-up exercise in this assignment).  You will use "bind_rows()".
-- Plot the combined data. (the most recent time period must be on the right side of the plot).        
-- Describe your conclusions to the question "How do recent atmospheric CO2 levels compare to historical levels?" using your plot as supporting evidence.   
+-   Describe the data set: what are the columns and units? Where do the numbers come from?
+-   What is the temporal resolution of the data?
+-   Read in and prepare data for analysis.\
+-   Reverse the ordering to create a chronological record so that each measurement is associcated with calender year.
+-   Plot data.\
+-   Combine this time series with the Mauna Loa data (the Warm-up exercise in this assignment). You will use "bind_rows()".
+-   Plot the combined data. (the most recent time period must be on the right side of the plot).\
+-   Describe your conclusions to the question "How do recent atmospheric CO2 levels compare to historical levels?" using your plot as supporting evidence.
 
 **Answer 10:**
 
@@ -164,11 +225,8 @@ Your answer to Question 10 is going to be a mix of code chunks and text that you
 
 # Render and committing
 
-Remember to Render your document as HTML and comment+push to GitHub your code and rendered HTML that was created when you knitted the document.  Your GitHub repository should have multiple commits with informative commit messages.
+Remember to Render your document as HTML and comment+push to GitHub your code and rendered HTML that was created when you knitted the document. Your GitHub repository should have multiple commits with informative commit messages.
 
 # Attribution
 
-Include citation of any AI-generated assistance or discussion with classmates (per policy in syllabus). Proper documentation of AI-generated assistance includes the prompt, the source (e.g., ChatGPT), and the significant parts of the response.  Proper documentation of discussion with classmates include listing their names and the components discussed.  
-
-
-
+Include citation of any AI-generated assistance or discussion with classmates (per policy in syllabus). Proper documentation of AI-generated assistance includes the prompt, the source (e.g., ChatGPT), and the significant parts of the response. Proper documentation of discussion with classmates include listing their names and the components discussed.
