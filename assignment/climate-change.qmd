@@ -50,7 +50,7 @@ There is a consistent upward trend in the data.This data shows a direct positive
 
 How does CO2 vary within a year? What month is it at max? Min? What might explain this sub-annual pattern? (you will need to write code and make a plot to answer this question)
 
-In order to answer this question I grouped by month and I averaged the co2 for each of the 12 months data over the years to get one average co2 value for each month. I then plotted that to show the trends and fluctuation that is shown throughout a year.The co2 reaches max levels in the month of may and minimum levels in September. This pattern can be explained by times that we reach peak respiration and photosynthesis. 
+In order to answer this question I grouped by month and I averaged the co2 for each of the 12 months data over the years to get one average co2 value for each month. I then plotted that to show the trends and fluctuation that is shown throughout a year.The co2 reaches max levels in the month of may and minimum levels in September. This pattern can be explained by times that we reach peak respiration and photosynthesis when you also take into account time it takes an ecosystem to respond. 
 **Answer 2:**
 ```{r}
 co2_average <- co2 |> 
@@ -160,6 +160,8 @@ global_temperature2 <- global_temperature |>
 
 Plot the different averages on the *same plot* and describe what differences you see and why.
 
+When all plotted on the same plot, you can see that they all follow the same general path but some of the averages are much more varying/robust and others are more smooth. This is because the different averages have different levels of smoothing of data by averaging shorter or longer amounts of time, with the shorter periods having more variation.
+
 **Answer 8:**
 ```{r}
 global_temperature2 |> 
@@ -178,6 +180,8 @@ global_temperature2 |>
 By examining the data here, what evidence do you find or not find for such a pause?
 
 **Answer 9:**
+The 2013 IPCC Report reported the pause as beginning in 1998, and that it showed a much smaller increasing trend in global mean temperature than previously observed. By looking at the rolling averages and charts I made, I do not find evidence for such a pause. If you look at the chart which shows change in global mean temperature over the years, you can see that around 1998, the change in global mean temperature is still increasing. As well, it is actually increasing at rates higher than shown in the early 1900s. Looking at the chart you can see more fluctuation within temperature earlier in the chart until reaching a turning point around 1960, in which a consistent increasing trend begins until the end of the chart. Overall, I do not find evidence for such a pause.
+
 
 ## Longer term trends in CO2 Records
 
@@ -216,10 +220,47 @@ Your answer to Question 10 is going to be a mix of code chunks and text that you
 -   Plot the combined data. (the most recent time period must be on the right side of the plot).\
 -   Describe your conclusions to the question "How do recent atmospheric CO2 levels compare to historical levels?" using your plot as supporting evidence.
 
+The data set is Historical CO2 Record from the Vostok Ice Core. It has four columns, first is depth which is measured in meters. Next is age of the ice which is measured in years before present. Next column is mean age of the air which is also measured in years before present. The last column is co2 concentration which is measured in parts per million by volume.  
 **Answer 10:**
 
 ```{r}
+vostok <- read_table("vostok.icecore.co2",
+                     col_names = c("Depth_m", "Age_of_ice_yearBP", "Mean_age_of_air_yearBP", "CO2_concentration_ppmv"), 
+                     comment = "*")
 
+vostok <- vostok[-c(1:4),]
+
+class("Depth_m")
+#just to check and make sure I need to transform data
+
+vostok <- transform(vostok, Depth_m = as.numeric(Depth_m), 
+                    Age_of_ice_yearBP = as.numeric(Age_of_ice_yearBP),
+                    Mean_age_of_air_yearBP = as.numeric(Mean_age_of_air_yearBP),
+                    CO2_concentration_ppmv = as.numeric(CO2_concentration_ppmv))
+
+vostok <- vostok |> 
+  mutate(Calendar_year = 1950 - as.numeric(Age_of_ice_yearBP))
+
+
+vostok <- vostok |> 
+  arrange(Calendar_year)
+
+vostok |> 
+  ggplot(aes(Calendar_year, CO2_concentration_ppmv)) +
+           geom_line()+
+           theme_bw()+
+           labs (x = "Calendar Year", y = "CO2 Concentration(ppmv)")
+
+####
+
+co2_rename <- co2 |> 
+  rename(CO2_concentration_ppm = monthly_average)
+
+vostok2 <- vostok |> 
+  rename(year = Calendar_year, CO2_concentration_ppm = CO2_concentration_ppmv)
+
+combined_data <- bind_rows(vostok2, co2_rename) |> 
+  arrange(year)
 
 ```
 
@@ -230,3 +271,5 @@ Remember to Render your document as HTML and comment+push to GitHub your code an
 # Attribution
 
 Include citation of any AI-generated assistance or discussion with classmates (per policy in syllabus). Proper documentation of AI-generated assistance includes the prompt, the source (e.g., ChatGPT), and the significant parts of the response. Proper documentation of discussion with classmates include listing their names and the components discussed.
+
+I worked with Hailey Trittin on question 4 and question 10. For question four they worked with me for the transformation portion and they helped me with the same transformation piece in question 10. I used statology.org in order to complete question 6. I then used what I learned in question 6 in order to answer question 7. I used chatgpt on question four, giving it the prompt of "in R, how do I skip the top 4 lines of code without using the skip() function?" and it taught me to use -c(). 
