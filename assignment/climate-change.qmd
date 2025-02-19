@@ -131,10 +131,11 @@ You will use rolling averages to help you explore the evidence for a pause. Sinc
 Use a search engine (e.g., Google) or a chat LLM to find out how to calculate a rolling average in R. What search term or chat LLM prompt did you use? What website or answer from the chat LLM did you end up using? How much did you need to modify the code from the website or chat LLM to answer the question successfully?
 
 **Answer 6:**
-I went onto yahoo and used the search term "How to calculate a rolling average in R". I decided to use the top search result. This took me to statology.org . I chose to do a k of 5 as the next question first mentions a period of five years. I did not have to change the code much in order to answer the question successfully, I just had to add in installation of the packages and substitute in my own data.
-```{r}
+I went onto yahoo and used the search term "How to calculate a rolling average in R". I decided to use the top search result. This took me to statology.org . I chose to do a k of 5 as the next question first mentions a period of five years. I did not have to change the code much in order to answer the question successfully, I just had to add in installation of the packages and substitute in my own data.(Wuld not allow me to render with package installation code added in. I will write the code I had said below)
 install.packages("dplyr")
 install.packages("zoo")
+
+```{r}
 library(dplyr)
 library(zoo)
 
@@ -220,7 +221,7 @@ Your answer to Question 10 is going to be a mix of code chunks and text that you
 -   Plot the combined data. (the most recent time period must be on the right side of the plot).\
 -   Describe your conclusions to the question "How do recent atmospheric CO2 levels compare to historical levels?" using your plot as supporting evidence.
 
-The data set is Historical CO2 Record from the Vostok Ice Core. It has four columns, first is depth which is measured in meters. Next is age of the ice which is measured in years before present. Next column is mean age of the air which is also measured in years before present. The last column is co2 concentration which is measured in parts per million by volume.  
+The data set is Historical CO2 Record from the Vostok Ice Core. It has four columns, first is depth which is measured in meters. Next is age of the ice which is measured in years before present. Next column is mean age of the air which is also measured in years before present. The last column is co2 concentration which is measured in parts per million by volume. The data is historic and has a larger window of time in between data measurements, which means it has a lower temporal resolution than other data sets such as the Mauna Loa dataset. I can conclude that recent atmospheric CO2 levels have seen a significant increase, to an almost unnatural degree. In the chart, you can see fluctuation of atmospheric CO2 levels over a long period of time, with natural increases and decreases. You can also see that it is generally balancing itself out, with no significant increases. This is until reaching recent years. Recent data shows an extreme and very rapid increase in atmospheric CO2 levels. This continues increasing until reaching the end of the chart. 
 **Answer 10:**
 
 ```{r}
@@ -251,8 +252,6 @@ vostok |>
            theme_bw()+
            labs (x = "Calendar Year", y = "CO2 Concentration(ppmv)")
 
-####
-
 co2_rename <- co2 |> 
   rename(CO2_concentration_ppm = monthly_average)
 
@@ -261,6 +260,12 @@ vostok2 <- vostok |>
 
 combined_data <- bind_rows(vostok2, co2_rename) |> 
   arrange(year)
+
+combined_data |> 
+  ggplot(aes(year, CO2_concentration_ppm)) +
+  geom_line() +
+  theme_bw() +
+  labs(title = "Historic and Current Atmospheric CO2 Levels Over Time", x = "Year", y = "CO2 Concentration(ppmv)")
 
 ```
 
